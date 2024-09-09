@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Controller
 public class UserController {
@@ -15,11 +16,11 @@ public class UserController {
     @Value("${kakao.redirect_uri}")
     private String redirect_uri;
 
-    @RequestMapping("/login")
+    @RequestMapping("/signin")
     public String loginPage(Model model) {
         String location = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=" + client_id + "&redirect_uri=" + redirect_uri;
         model.addAttribute("location", location);
 
-        return "login";
+        return "signin";
     }
 }

@@ -23,6 +23,12 @@ spring:
       mode: always
       platform: h2
 
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
+    mode: html
+
 kakao:
   client_id: bcb76b67b0be3552381768d910bde2d3
   redirect_uri: http://localhost:8080/signin
