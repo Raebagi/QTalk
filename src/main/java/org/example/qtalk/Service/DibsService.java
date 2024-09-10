@@ -1,16 +1,25 @@
 package org.example.qtalk.Service;
 
+import org.example.qtalk.repository.DibsRepository;
 import org.springframework.stereotype.Service;
+
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.io.BufferedReader;
-import java.io.IOException;
 
 @Service
-public class DateService {
+public class DibsService {
 
+    private final DibsRepository dibsRepository;
+
+    public DibsService(DibsRepository dibsRepository) {
+        this.dibsRepository = dibsRepository;
+    }
+
+    //한국산업인력공단 api - 시험일정
     public String getDateInfo() {
         StringBuilder sb = new StringBuilder();
         try {
@@ -18,9 +27,9 @@ public class DateService {
             urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "="); /*Service Key*/
             urlBuilder.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("10", "UTF-8")); /*한 페이지 결과 수*/
             urlBuilder.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /*페이지번호*/
-            urlBuilder.append("&" + URLEncoder.encode("dataFormat", "UTF-8") + "=" + URLEncoder.encode("xml", "UTF-8")); /*응답 데이터 형식*/
+            urlBuilder.append("&" + URLEncoder.encode("dataFormat", "UTF-8") + "=" + URLEncoder.encode("json", "UTF-8")); /*응답 데이터 형식*/
             urlBuilder.append("&" + URLEncoder.encode("implYy", "UTF-8") + "=" + URLEncoder.encode("2024", "UTF-8")); /*시행년도*/
-            urlBuilder.append("&" + URLEncoder.encode("qualgbCd", "UTF-8") + "=" + URLEncoder.encode("T", "UTF-8")); /*자격구분코드*/
+            urlBuilder.append("&" + URLEncoder.encode("qualgbCd","UTF-8") + "=" + URLEncoder.encode("T", "UTF-8")); /*자격구분코드 - T : 국가기술자격 - C : 과정평가형자격 - W : 일학습병행자격 - S : 국가전문자격*/
             urlBuilder.append("&" + URLEncoder.encode("jmCd", "UTF-8") + "=" + URLEncoder.encode("7910", "UTF-8")); /*종목코드 값*/
 
             URL url = new URL(urlBuilder.toString());
@@ -45,8 +54,6 @@ public class DateService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        // StringBuilder에 저장된 내용을 문자열로 반환
         return sb.toString();
     }
 }
