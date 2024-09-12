@@ -32,3 +32,6 @@ spring:
 kakao:
   client_id: bcb76b67b0be3552381768d910bde2d3
   redirect_uri: http://localhost:8080/signin
+
+  log:
+
