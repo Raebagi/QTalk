@@ -1,32 +1,33 @@
-/*package org.example.qtalk.controller;
+package org.example.qtalk.Controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.qtalk.service.KakaoService;
+import org.example.qtalk.DTO.KakaoUserInfoResponseDto;
+import org.example.qtalk.Service.KakaoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 
 @Slf4j
-@Controller
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("")
 public class KakaoLoginController {
 
     private final KakaoService kakaoService;
 
     @GetMapping("/signin")
-    public ResponseEntity<?> getAccessToken(@RequestParam(value = "code", required = false) String code) {
-        if (code == null) {
-            return new ResponseEntity<>("Code parameter is missing", HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<?> callback(@RequestParam("code") String code) {
         String accessToken = kakaoService.getAccessTokenFromKakao(code);
-        return new ResponseEntity<>(accessToken, HttpStatus.OK);
+
+        KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(accessToken);
+
+        // User 로그인, 또는 회원가입 로직 추가
+        return new ResponseEntity<>(HttpStatus.OK);
     }
-}*/
-
-
+}

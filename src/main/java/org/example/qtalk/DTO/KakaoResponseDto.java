@@ -1,4 +1,4 @@
-package org.example.qtalk.dto;
+package org.example.qtalk.DTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor //역직렬화를 위한 기본 생성자
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class KakaoResponseDTO {
+public class KakaoResponseDto {
 
     @JsonProperty("token_type")
     public String tokenType;
