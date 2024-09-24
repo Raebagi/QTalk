@@ -1,4 +1,4 @@
-package org.example.qtalk.DTO;
+package org.example.qtalk.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
