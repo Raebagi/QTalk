@@ -1,7 +1,7 @@
 package org.example.qtalk.mapper;
 
 import org.example.qtalk.Entity.UserEntity;
-import org.example.qtalk.dto.KakaoUserInfoResponseDto;
+import org.example.qtalk.Dto.KakaoUserInfoResponseDto;
 import org.springframework.stereotype.Component;
 
 @Component

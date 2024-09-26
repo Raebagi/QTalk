@@ -2,9 +2,11 @@ package org.example.qtalk.Service;
 
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.example.qtalk.dto.KakaoResponseDto;
-import org.example.qtalk.dto.KakaoUserInfoResponseDto;
+import lombok.extern.slf4j.*;
+import org.example.qtalk.Dto.KakaoResponseDto;
+import org.example.qtalk.Dto.KakaoUserInfoResponseDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +19,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @Service
 public class KakaoService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(KakaoService.class);
 
     private final String clientId;
     private final String KAUTH_TOKEN_URL_HOST;
@@ -48,8 +51,8 @@ public class KakaoService {
                 .bodyToMono(KakaoResponseDto.class)
                 .block();
 
-        log.info(" [Kakao Service] Access Token ------> {}", kakaoResponseDto.getAccessToken());
-        log.info(" [Kakao Service] Refresh Token ------> {}", kakaoResponseDto.getRefreshToken());
+        LOGGER.info(" [Kakao Service] Access Token ------> {}", kakaoResponseDto.getAccessToken());
+        LOGGER.info(" [Kakao Service] Refresh Token ------> {}", kakaoResponseDto.getRefreshToken());
 
         return kakaoResponseDto.getAccessToken();
     }
@@ -63,20 +66,17 @@ public class KakaoService {
                         .path("/v2/user/me")
                         .build(true))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new RuntimeException("Invalid Parameter")))
-                .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new RuntimeException("Internal Server Error")))
                 .bodyToMono(KakaoUserInfoResponseDto.class)
                 .block();
 
-        log.info("[ Kakao Service ] Auth ID ---> {} ", userInfo.getId());
-        log.info("[ Kakao Service ] NickName ---> {} ", userInfo.getKakaoAccount().getProfile().getNickName());
-        log.info("[ Kakao Service ] ProfileImageUrl ---> {} ", userInfo.getKakaoAccount().getProfile().getProfileImageUrl());
-        log.info("[ Kakao Service ] Email ---> {} ", userInfo.getKakaoAccount().getEmail());
+        LOGGER.info("Kakao User Info: {}", userInfo);
 
-        // 사용자 정보를 저장
-        userService.createUserFromKakao(userInfo); // UserService의 메서드를 호출하여 저장
         return userInfo;
+    }
+
+    // 사용자 정보 저장 메서드 분리
+    public boolean saveUserInfo(KakaoUserInfoResponseDto userInfo) {
+        return userService.createUserFromKakao(userInfo);
     }
 }

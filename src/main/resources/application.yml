@@ -1,3 +1,8 @@
+logging:
+  level:
+    root: DEBUG # 기본 로그 레벨
+
+
 spring:
 #  datasource:
 #    url: jdbc:mariadb://localhost:3306/QTalk
@@ -33,5 +38,7 @@ spring:
 kakao:
   client_id: bcb76b67b0be3552381768d910bde2d3
   redirect_uri: http://localhost:8080/signin
+
+
 
 
