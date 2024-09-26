@@ -89,23 +89,6 @@ public class KakaoUserInfoResponseDto {
         @JsonProperty("email")
         public String email;
 
-        //연령대 제공 동의 여부
-        @JsonProperty("age_range_needs_agreement")
-        public Boolean isAgeAgree;
-
-        //연령대
-        //참고 https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#req-user-info
-        @JsonProperty("age_range")
-        public String ageRange;
-
-        //출생 연도 제공 동의 여부
-        @JsonProperty("birthyear_needs_agreement")
-        public Boolean isBirthYearAgree;
-
-        //출생 연도 (YYYY 형식)
-        @JsonProperty("birthyear")
-        public String birthYear;
-
         //생일 제공 동의 여부
         @JsonProperty("birthday_needs_agreement")
         public Boolean isBirthDayAgree;

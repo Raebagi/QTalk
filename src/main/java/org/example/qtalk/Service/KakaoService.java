@@ -18,19 +18,21 @@ import reactor.core.publisher.Mono;
 @Service
 public class KakaoService {
 
-    private String clientId;
-    private final String KAUTH_TOKEN_URL_HOST ;
+    private final String clientId;
+    private final String KAUTH_TOKEN_URL_HOST;
     private final String KAUTH_USER_URL_HOST;
+    private final UserService userService; // UserService를 주입받습니다.
 
     @Autowired
-    public KakaoService(@Value("${kakao.client_id}") String clientId) {
+    public KakaoService(@Value("${kakao.client_id}") String clientId, UserService userService) {
         this.clientId = clientId;
-        KAUTH_TOKEN_URL_HOST ="https://kauth.kakao.com";
+        this.userService = userService; // UserService 주입
+        KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com";
         KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
     }
 
+    // Access Token을 Kakao로부터 받아오는 메서드
     public String getAccessTokenFromKakao(String code) {
-
         KakaoResponseDto kakaoResponseDto = WebClient.create(KAUTH_TOKEN_URL_HOST).post()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("https")
@@ -41,37 +43,28 @@ public class KakaoService {
                         .build(true))
                 .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
                 .retrieve()
-                //TODO : Custom Exception
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new RuntimeException("Invalid Parameter")))
                 .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new RuntimeException("Internal Server Error")))
                 .bodyToMono(KakaoResponseDto.class)
                 .block();
 
-
         log.info(" [Kakao Service] Access Token ------> {}", kakaoResponseDto.getAccessToken());
         log.info(" [Kakao Service] Refresh Token ------> {}", kakaoResponseDto.getRefreshToken());
-        //제공 조건: OpenID Connect가 활성화 된 앱의 토큰 발급 요청인 경우 또는 scope에 openid를 포함한 추가 항목 동의 받기 요청을 거친 토큰 발급 요청인 경우
-        log.info(" [Kakao Service] Id Token ------> {}", kakaoResponseDto.getIdToken());
-        log.info(" [Kakao Service] Scope ------> {}", kakaoResponseDto.getScope());
 
         return kakaoResponseDto.getAccessToken();
     }
 
-
-
-
+    // 사용자 정보를 Kakao API로부터 받아오는 메서드
     public KakaoUserInfoResponseDto getUserInfo(String accessToken) {
-
         KakaoUserInfoResponseDto userInfo = WebClient.create(KAUTH_USER_URL_HOST)
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("https")
                         .path("/v2/user/me")
                         .build(true))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken) // access token 인가
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
                 .retrieve()
-                //TODO : Custom Exception
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new RuntimeException("Invalid Parameter")))
                 .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new RuntimeException("Internal Server Error")))
                 .bodyToMono(KakaoUserInfoResponseDto.class)
@@ -80,7 +73,10 @@ public class KakaoService {
         log.info("[ Kakao Service ] Auth ID ---> {} ", userInfo.getId());
         log.info("[ Kakao Service ] NickName ---> {} ", userInfo.getKakaoAccount().getProfile().getNickName());
         log.info("[ Kakao Service ] ProfileImageUrl ---> {} ", userInfo.getKakaoAccount().getProfile().getProfileImageUrl());
+        log.info("[ Kakao Service ] Email ---> {} ", userInfo.getKakaoAccount().getEmail());
 
+        // 사용자 정보를 저장
+        userService.createUserFromKakao(userInfo); // UserService의 메서드를 호출하여 저장
         return userInfo;
     }
 }
